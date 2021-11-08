@@ -1,5 +1,5 @@
 import random
-#from player import Player
+
 
 import pygame
 from sys import exit  # this will close the any of the code
@@ -47,16 +47,17 @@ def player_animation():
         player_surf = player_run[int(player_index)]
 
 
-# https://www.youtube.com/watch?v=AY9MnQ4x3zk
+
 pygame.init() # this to start the py game to initialize it
 
 screen = pygame.display.set_mode((1150,385)) # setting the screen and its size, we have to give him tuple
-pygame.display.set_caption("Pixel Runner | GAME MADE FOR THEO") # to je naslov od igre oz. okna
+pygame.display.set_caption("Pixel Runner | GAME MADE FOR THEO") # setting caption of the main window
 clock = pygame.time.Clock() # clock object which will tel the game that it should not run faster as 60 frame/s
-main_font = pygame.font.Font('fonts/VT323-Regular.ttf', 50) # punting in the font
+main_font = pygame.font.Font('fonts/VT323-Regular.ttf', 50) #Font
 
 tittle_text = main_font.render("Pixel runner | Game made for my son Theo", False,"White")
 tittle_text_rect = tittle_text.get_rect(center=(575,30))
+score = 1 # for Level | Score 
 
 instructions_text = main_font.render("Press space to start the game", False, "White")
 instructions_text_rect = instructions_text.get_rect(center=(575,340))
@@ -67,7 +68,7 @@ sky_surface = pygame.image.load('sprites/sky/sky.png').convert() # convert it to
 ground_surface = pygame.image.load('sprites/ground/ground.png').convert()
 finish_line = pygame.image.load('sprites/finish_line/fin_linet.png')
 
-# obstacles
+# -- obstacles -- #
 
 # snail
 snail_frame_1 = pygame.image.load("sprites/enemy/snail/snail_1.png").convert_alpha()
@@ -75,22 +76,21 @@ snail_frame_2 = pygame.image.load("sprites/enemy/snail/snail_2.png").convert_alp
 snail_frames = [snail_frame_1, snail_frame_2]
 snail_index = 0
 snail_surf = snail_frames[snail_index]
-#snail_rect = snail_frame[snail_index].get_rect(midbottom=(1200, 315))
+snail_speed = 1
 
-
-
+# fly
 fly_frame_1 = pygame.image.load("sprites/enemy/fly/fly_1l.png").convert_alpha()
 fly_frame_2 = pygame.image.load('sprites/enemy/fly/fly_2.png').convert_alpha()
 fly_frames = [fly_frame_1, fly_frame_2]
 fly_index = 0
 fly_surf = fly_frames[fly_index]
-#fly_surf_wings_up_rect = fly_frames[fly_index].get_rect(midbottom=(1200, 300))
 
-obstice_rect_list = []
+obstice_rect_list = [] # list of enemy`s
 
-player_stand_surf = pygame.image.load('sprites/user/user_standing.png').convert_alpha()
-player_stand_rect = player_stand_surf.get_rect(midbottom=(100, 315))
+
+
 # player running
+player_stand_surf = pygame.image.load('sprites/user/user_standing.png').convert_alpha()
 player_run1_surf = pygame.image.load("sprites/user/user_running_1.png")
 player_run2_surf = pygame.image.load('sprites/user/user_running_2.png')
 player_run = [player_run1_surf, player_run2_surf]
@@ -100,22 +100,21 @@ player_squad = pygame.image.load("sprites/user/user_squad.png")
 
 player_surf = player_run[player_index]
 player_rect = player_surf.get_rect(midbottom=(80,315))
+
+player_stand_rect = player_stand_surf.get_rect(midbottom=(100, 315))
 player_stand_scaled = pygame.transform.scale2x(player_stand_surf)
 player_stand_scaled_rect = player_stand_scaled.get_rect(midbottom=(575, 300))
-# game_name_and_score_surf = main_font.render('Theo`s game', False, 'Black')
-# score_rect = game_name_and_score_surf.get_rect(center=(575,50))
+
+player_gravity = 0
+user_squat = False
+player_speed = 2
+last_player_speed = 0
 
 # sound
 intro_music = pygame.mixer.Sound('music/Juhani Junkala [Retro Game Music Pack] Ending.wav')
 running_music = pygame.mixer.Sound('music/Juhani Junkala [Retro Game Music Pack] Level 1.wav')
 
-player_gravity = 0
-snail_speed = 1
-score = 1
-
-#player = pygame.sprite.GroupSingle()
-#player.add(Player())
-# Timer
+# Timers
 obstacle_timer = pygame.USEREVENT + 1
 pygame.time.set_timer(obstacle_timer,3000)
 
@@ -125,18 +124,15 @@ pygame.time.set_timer(snail_animation_timer, 500)
 fly_animation_timer = pygame.USEREVENT +3
 pygame.time.set_timer(fly_animation_timer,200)
 
-
+# Game logic 
 game_running = False
-user_squat = False
-player_speed = 2
-last_player_speed = 0
+
 while True:
 
     for event in pygame.event.get(): # to get all of the events
         if event.type == pygame.QUIT: # to check if the event was quit to close the window
             pygame.quit()
             exit() # to use exit which will close and and any code you have to import sys and give initialize it as exit
-          # // sky // #
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and player_rect.bottom == 315:
@@ -181,30 +177,15 @@ while True:
             fly_surf = fly_frames[fly_index]
     if game_running:
         game_running = collisions(player_rect, obstice_rect_list)
-        screen.blit(sky_surface,(0,0)) # to put something on the string you need first screen and than blit comand which take two paramete one is what and second is location
+        screen.blit(sky_surface,(0,0))
         screen.blit(finish_line,(900,215))
-# //     ground // #
+        # creating ground
         x_loc = 0
         for i in range(16):
             screen.blit(ground_surface, (x_loc, 315))
             x_loc+=73
 
-
-
-
-        # // text surface // #
-        #pygame.draw.rect(screen,"Pink",score_rect) # for background on score rect
-        #pygame.draw.rect(screen, "Pink", score_rect, 10)  # for background
-        #screen.blit(game_name_and_score_surf, score_rect)
         display_score(level=score)
-# //     enemy // #
-#         snail_x_loc_enemy -= 2
-#         if snail_x_loc_enemy < -80: snail_x_loc_enemy = 1200
-
-        # snail_rect.right -= snail_speed
-        # screen.blit(snail_surf, snail_rect)
-        # if snail_rect.right <= 0: snail_rect.right = 1200
-# //     user // #
 
 
         player_rect.left +=player_speed # to move the player to the left
@@ -217,12 +198,9 @@ while True:
 
         if player_rect.bottom >=315 and user_squat == True:
             player_rect.bottom = 360
-
         screen.blit(player_surf, player_rect)
-        #player.draw(surface=screen)
-        #player.update()
-
-        #Obsticle movmetn
+        
+# Obsticle movement
         obstice_rect_list = obsticle_movment(obstice_rect_list)
 
         if player_rect.left > 900:
@@ -231,12 +209,7 @@ while True:
             score +=1
             player_speed += 1
 
-
-#getting keyboard input
-        # keys = pygame.key.get_pressed()
-        # if keys[pygame.K_SPACE] == True:
-        #     print("Jump")
-# collisions
+# Collisions
     else:
         obstice_rect_list.clear()
         player_gravity = 0
@@ -255,6 +228,5 @@ while True:
         screen.blit(player_stand_scaled, player_stand_scaled_rect)
         screen.blit(instructions_text,instructions_text_rect)
 
-    #print(pygame.mouse.get_pos())
     pygame.display.update()
     clock.tick(60)
